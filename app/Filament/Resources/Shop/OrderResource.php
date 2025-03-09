@@ -92,11 +92,6 @@ class OrderResource extends Resource
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('status')
                     ->badge(),
-                Tables\Columns\TextColumn::make('currency')
-                    ->getStateUsing(fn ($record): ?string => Currency::find($record->currency)?->name ?? null)
-                    ->searchable()
-                    ->sortable()
-                    ->toggleable(),
                 Tables\Columns\TextColumn::make('total_price')
                     ->searchable()
                     ->sortable()
@@ -280,17 +275,9 @@ class OrderResource extends Resource
                 ->options(OrderStatus::class)
                 ->required(),
 
-            Forms\Components\Select::make('currency')
-                ->searchable()
-                ->getSearchResultsUsing(fn (string $query) => Currency::where('name', 'like', "%{$query}%")->pluck('name', 'id'))
-                ->getOptionLabelUsing(fn ($value): ?string => Currency::firstWhere('id', $value)?->getAttribute('name'))
-                ->required(),
-
             AddressForm::make('address')
                 ->columnSpan('full'),
 
-            Forms\Components\MarkdownEditor::make('notes')
-                ->columnSpan('full'),
         ];
     }
 

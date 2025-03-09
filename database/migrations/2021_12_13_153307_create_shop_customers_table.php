@@ -17,9 +17,12 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
+            $table->string('password');
             $table->string('photo')->nullable();
             $table->enum('gender', ['male', 'female']);
             $table->string('phone')->nullable();
+            $table->string('city')->nullable();
+            $table->string('state')->nullable();
             $table->date('birthday')->nullable();
             $table->timestamps();
             $table->softDeletes();

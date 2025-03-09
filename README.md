@@ -1,102 +1,59 @@
-# Filament Demo App
+# Ecommerce Demo
 
-A demo application to illustrate how Filament Admin works.
+A robust Laravel 11 backend application.
 
-![Filament Demo](https://github.com/filamentphp/demo/assets/171715/899161a9-3c85-4dc9-9599-13928d3a4412)
+## Table of Contents
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Running the Application](#running-the-application)
 
-[Open in Gitpod](https://gitpod.io/#https://github.com/filamentphp/demo) to edit it and preview your changes with no setup required.
+## Prerequisites
 
-## Installation
+Before installing the project, ensure you have the following installed on your system:
 
-Clone the repo locally:
+- **PHP**: Version 8.2 or higher
+- **Composer**: Version 2.x (dependency manager for PHP)
+- **Node.js**: Version 18.x or higher (optional, if frontend assets are included)
+- **MySQL**: Version 8.0 or higher (or another compatible database like PostgreSQL)
+- **Git**: For cloning the repository
+- **Laravel CLI**: Optional, for artisan commands (install via `composer global require laravel/installer`)
+- **Web Server**: Apache or Nginx (optional, if not using Laravel’s built-in server)
 
-```sh
-git clone https://github.com/laravel-filament/demo.git filament-demo && cd filament-demo
+Verify PHP and Composer versions:
+```bash
+php -v
+composer --version
 ```
 
-Install PHP dependencies:
+Clone the Repository
 
-```sh
+git clone https://github.com/yourusername/yourproject.git
+cd yourproject
+
+Install PHP Dependencies
+```bash
 composer install
 ```
 
-Setup configuration:
+Copy Environment File
 
-```sh
+```bash
 cp .env.example .env
 ```
 
-Generate application key:
+Generate Application Key
 
-```sh
+```bash
 php artisan key:generate
 ```
 
-Create an SQLite database. You can also use another database (MySQL, Postgres), simply update your configuration accordingly.
-
-```sh
-touch database/database.sqlite
+Run Migrations 
+```bash
+php artisan migrate --seed
 ```
 
-Run database migrations:
-
-```sh
-php artisan migrate
-```
-
-Run database seeder:
-
-```sh
-php artisan db:seed
-```
-
-> **Note**  
-> If you get an "Invalid datetime format (1292)" error, this is probably related to the timezone setting of your database.  
-> Please see https://dba.stackexchange.com/questions/234270/incorrect-datetime-value-mysql
-
-
-Create a symlink to the storage:
-
-```sh
-php artisan storage:link
-```
-
-Run the dev server (the output will give the address):
-
-```sh
+Start the Development Server
+```bash
 php artisan serve
 ```
-
-You're ready to go! Visit the url in your browser, and login with:
-
--   **Username:** admin@filamentphp.com
--   **Password:** password
-
-## Features to explore
-
-### Relations
-
-#### BelongsTo
-- ProductResource
-- OrderResource
-- PostResource
-
-#### BelongsToMany
-- CategoryResource\RelationManagers\ProductsRelationManager
-
-#### HasMany
-- OrderResource\RelationManagers\PaymentsRelationManager
-
-#### HasManyThrough
-- CustomerResource\RelationManagers\PaymentsRelationManager
-
-#### MorphOne
-- OrderResource -> Address
-
-#### MorphMany
-- ProductResource\RelationManagers\CommentsRelationManager
-- PostResource\RelationManagers\CommentsRelationManager
-
-#### MorphToMany
-- BrandResource\RelationManagers\AddressRelationManager
-- CustomerResource\RelationManagers\AddressRelationManager

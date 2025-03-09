@@ -13,4 +13,9 @@ class OrderItem extends Model
      * @var string
      */
     protected $table = 'shop_order_items';
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class, 'shop_product_id');
+    }
 }
