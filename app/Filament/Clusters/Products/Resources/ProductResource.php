@@ -147,29 +147,21 @@ class ProductResource extends Resource
                     ->sortable()
                     ->columnSpan(2),
 
-                Tables\Columns\TextColumn::make('sku')
-                    ->label('SKU')
-                    ->searchable()
+                Tables\Columns\TextColumn::make('paid_supplies_quantity')
+                    ->label('Stock Qty')
+                    ->numeric()
                     ->sortable()
-                    ->toggleable(),
-
-                Tables\Columns\TextColumn::make('qty')
-                    ->label('Quantity')
-                    ->searchable()
-                    ->sortable()
-                    ->toggleable(),
+                    ->getStateUsing(fn ($record) => $record->paid_supplies_quantity)
             ])
             ->filters([
                 QueryBuilder::make()
                     ->constraints([
                         TextConstraint::make('name'),
                         TextConstraint::make('slug'),
-                        TextConstraint::make('sku')
-                            ->label('SKU (Stock Keeping Unit)'),
                         TextConstraint::make('description'),
                         NumberConstraint::make('price')
                             ->icon('heroicon-m-currency-dollar'),
-                        NumberConstraint::make('qty')
+                        NumberConstraint::make('stock_qty')
                             ->label('Quantity'),
                         BooleanConstraint::make('is_visible')
                             ->label('Visibility'),

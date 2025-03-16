@@ -17,6 +17,6 @@ class Supply extends Model
     }
 
     public function supplier(): BelongsTo {
-        return $this->belongsTo(User::class , 'supplier_id');
+        return $this->belongsTo(User::class , 'suppier_id');
     }
 }

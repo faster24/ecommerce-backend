@@ -7,10 +7,12 @@ use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Auth\Authenticatable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Notifications\Notifiable;
+use App\Models\Shop\Order;
 
 class Customer extends Model implements AuthenticatableContract
 {
-    use Authenticatable, HasApiTokens, SoftDeletes;
+    use Authenticatable, HasApiTokens, SoftDeletes , Notifiable;
 
     /**
      * @var string
@@ -53,4 +55,14 @@ class Customer extends Model implements AuthenticatableContract
         'birthday' => 'date',
         'deleted_at' => 'datetime',
     ];
+
+    public function tickets()
+    {
+        return $this->hasMany(Ticket::class);
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class , 'shop_customer_id');
+    }
 }

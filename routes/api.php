@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\BrandController;
+use App\Http\Controllers\TicketController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\Api\BlogPostController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\AuthController;
@@ -26,9 +28,9 @@ Route::middleware('auth:sanctum')->group(function() {
 });
 
 Route::prefix('products')->controller(ProductController::class)->group(function () {
-    Route::get('/', 'index'); // List all products
-    Route::get('/search', 'search'); // Search products (placed before show)
-    Route::get('/{id}', 'show'); // Show a specific product by numeric ID
+    Route::get('/', 'index');
+    Route::get('/search', 'search');
+    Route::get('/{id}', 'show');
 });
 
 Route::prefix('order')->controller(OrderController::class)->group(function() {
@@ -47,4 +49,15 @@ Route::group(['prefix' => 'categories'], function () {
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/profile', [CustomerController::class, 'getProfile']);
     Route::put('/profile', [CustomerController::class, 'updateProfile']);
+});
+
+Route::prefix('blogs')->group(function () {
+    Route::get('/', [BlogPostController::class, 'index']);
+    Route::get('/{id}', [BlogPostController::class, 'show']);
+});
+
+Route::prefix('tickets')->group(function() {
+    Route::get('/', [TicketController::class, 'index']);
+    Route::post('/', [TicketController::class, 'store']);
+    Route::get('/{id}', [TicketController::class, 'show']);
 });

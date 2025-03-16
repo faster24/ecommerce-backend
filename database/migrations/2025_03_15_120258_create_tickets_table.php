@@ -16,6 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id');
             $table->string('subject');
             $table->text('message');
+            $table->string('status')->default('pending');
             $table->timestamps();
         });
     }

@@ -10,6 +10,16 @@ class ListSupplies extends ListRecords
 {
     protected static string $resource = SupplyResource::class;
 
+    protected function getTableActions(): array
+    {
+        return [
+            Actions\Action::make('review')
+                ->label('Review Payment')
+                ->url(fn ($record): string => SupplyResource::getUrl('review', ['record' => $record]))
+                ->icon('heroicon-o-currency-dollar'),
+            Actions\EditAction::make(),
+        ];
+    }
     protected function getHeaderActions(): array
     {
         return [

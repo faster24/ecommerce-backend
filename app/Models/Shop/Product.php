@@ -49,4 +49,16 @@ class Product extends Model implements HasMedia
     {
         return $this->morphMany(Comment::class, 'commentable');
     }
+
+    public function supplies()
+    {
+        return $this->hasMany(Supply::class, 'product_id');
+    }
+
+    public function getPaidSuppliesQuantityAttribute()
+    {
+        return $this->supplies()
+            ->where('payment_status', 'paid')
+            ->sum('quantity');
+    }
 }

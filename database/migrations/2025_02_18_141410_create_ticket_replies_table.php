@@ -13,8 +13,7 @@ return new class extends Migration
     {
         Schema::create('ticket_replies', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id');
-            $table->unsignedBigInteger('ticket');
+            $table->unsignedBigInteger('ticket_id');
             $table->text('message');
             $table->timestamps();
         });

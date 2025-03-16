@@ -21,7 +21,11 @@ class SupplyResource extends Resource
 {
     protected static ?string $model = Supply::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-cube';
+
+    protected static ?string $navigationLabel = 'Supplies';
+
+    protected static ?string $navigationGroup = 'Inventory';
 
     public static function form(Form $form): Form
     {
@@ -30,18 +34,16 @@ class SupplyResource extends Resource
                 Select::make('product_id')
                     ->relationship('product' , 'name')
                     ->preload()
+                    ->searchable()
                     ->required(),
 
-                Hidden::make('supplier_id')->default(auth()->id()),
+                Hidden::make('suppier_id')->default(auth()->id()),
 
                 TextInput::make('quantity')->numeric(),
                 TextInput::make('price')->numeric(),
 
-                Select::make('payment_status')->options([
-                    'in_progress' => 'In Progress',
-                    'reviewing' => 'Reviewing',
-                    'finished' => 'Finished',
-                ]),
+                Hidden::make('payment_status')
+                    ->default('pending'),
             ]);
     }
 
@@ -57,8 +59,9 @@ class SupplyResource extends Resource
                 TextColumn::make('payment_status')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'in_progress' => 'warning',
-                        'finished' => 'success',
+                        'pending' => 'warning',
+                        'paid' => 'success',
+                        'rejected' => 'danger',
                         'reviewing' => 'gray',
     })
             ])
@@ -66,6 +69,11 @@ class SupplyResource extends Resource
                 //
             ])
             ->actions([
+                Tables\Actions\Action::make('review')
+                    ->label('Review')
+                    ->visible(fn () => auth()->user()->hasRole('super_admin'))
+                    ->url(fn ($record): string => static::getUrl('review', ['record' => $record]))
+                    ->icon('heroicon-o-currency-dollar'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -87,6 +95,7 @@ class SupplyResource extends Resource
             'index' => Pages\ListSupplies::route('/'),
             'create' => Pages\CreateSupply::route('/create'),
             'edit' => Pages\EditSupply::route('/{record}/edit'),
+            'review' => Pages\Supply\ReviewPayment::route('/{record}/review'),
         ];
     }
 }

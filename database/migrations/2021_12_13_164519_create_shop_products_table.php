@@ -18,9 +18,8 @@ return new class extends Migration
             $table->foreignId('shop_brand_id')->nullable()->constrained()->nullOnDelete();
             $table->string('name');
             $table->string('slug')->unique()->nullable();
-            $table->string('sku')->unique()->nullable();
             $table->longText('description')->nullable();
-            $table->unsignedBigInteger('qty')->default(0);
+            $table->unsignedBigInteger('stock_qty')->default(0);
             $table->boolean('featured')->default(false);
             $table->boolean('is_visible')->default(false);
             $table->decimal('price', 10, 2)->nullable();

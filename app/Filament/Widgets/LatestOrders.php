@@ -7,7 +7,6 @@ use App\Models\Shop\Order;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
-use Squire\Models\Currency;
 
 class LatestOrders extends BaseWidget
 {
@@ -19,8 +18,9 @@ class LatestOrders extends BaseWidget
     {
         return $table
             ->query(OrderResource::getEloquentQuery())
-            ->defaultPaginationPageOption(5)
             ->defaultSort('created_at', 'desc')
+            ->paginated([5, 10, 25, 50]) // Define available pagination options
+            ->defaultPaginationPageOption(5) // Set default to 5 rows
             ->columns([
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Order Date')
@@ -34,10 +34,6 @@ class LatestOrders extends BaseWidget
                     ->sortable(),
                 Tables\Columns\TextColumn::make('status')
                     ->badge(),
-                Tables\Columns\TextColumn::make('currency')
-                    ->getStateUsing(fn ($record): ?string => Currency::find($record->currency)?->name ?? null)
-                    ->searchable()
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('total_price')
                     ->searchable()
                     ->sortable(),
