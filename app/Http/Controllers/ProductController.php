@@ -98,4 +98,43 @@ class ProductController extends Controller
             'data' => $products,
         ]);
     }
+
+    public function filterByName(Request $request)
+    {
+        $request->validate([
+            'name' => 'nullable|string|max:255',
+        ]);
+
+        // Build the query
+        $query = Product::query()
+            ->with('media') // Load media relationship
+            ->select('shop_products.*'); // Explicitly select product fields
+
+        // Filter by name
+        if ($name = $request->query('name')) {
+            $query->where('name', 'like', "%{$name}%");
+        }
+
+        // Paginate results (default 10 per page)
+        $products = $query->paginate(10)->through(function ($product) {
+            $product->media->each(function ($media) {
+                $media->url = $media->getUrl(); // Include media URL
+            });
+            return $product;
+        });
+
+        // Return JSON response
+        return response()->json([
+            'status' => 'success',
+            'data' => $products->items(),
+            'pagination' => [
+                'total' => $products->total(),
+                'per_page' => $products->perPage(),
+                'current_page' => $products->currentPage(),
+                'last_page' => $products->lastPage(),
+                'from' => $products->firstItem(),
+                'to' => $products->lastItem(),
+            ],
+        ], 200);
+    }
 }
