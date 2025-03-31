@@ -18,6 +18,7 @@ Route::prefix('products')->controller(ProductController::class)->group(function 
     Route::get('/search', 'search');
     Route::get('/filterProduct' , 'filterByName');
     Route::get('/{id}', 'show');
+    Route::get('/{id}/related' , 'getRelatedProducts');
 });
 
 Route::prefix('order')->controller(OrderController::class)->group(function() {

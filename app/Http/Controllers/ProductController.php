@@ -105,12 +105,10 @@ class ProductController extends Controller
             'name' => 'nullable|string|max:255',
         ]);
 
-        // Build the query
         $query = Product::query()
             ->with('media') // Load media relationship
             ->select('shop_products.*'); // Explicitly select product fields
 
-        // Filter by name
         if ($name = $request->query('name')) {
             $query->where('name', 'like', "%{$name}%");
         }
@@ -136,5 +134,53 @@ class ProductController extends Controller
                 'to' => $products->lastItem(),
             ],
         ], 200);
+    }
+
+    public function getRelatedProducts($id)
+    {
+        try {
+            $product = Product::with('brand')->find($id);
+
+            if (!$product) {
+                return response()->json([
+                    'message' => 'Product not found',
+                ], 404);
+            }
+
+            $brandId = $product->shop_brand_id;
+
+            if (!$brandId) {
+                return response()->json([
+                    'message' => 'No brand associated with this product',
+                    'related_products' => [],
+                ], 200);
+            }
+
+            $relatedProducts = Product::where('shop_brand_id', $brandId)
+                ->where('id', '!=', $id)
+                ->where('is_visible', true)
+                ->with('media')
+                ->limit(5)
+                ->get(['id', 'name', 'slug', 'price', 'description', 'stock_qty']);
+
+            $relatedProducts->transform(function ($relatedProduct) {
+                $media = $relatedProduct->getMedia('product-images');
+                $image = $media->first() ? $media->first()->getUrl() : null;
+                $relatedProduct->image = $image;
+                unset($relatedProduct->media);
+                return $relatedProduct;
+            });
+
+            return response()->json([
+                'message' => 'Related products retrieved successfully',
+                'related_products' => $relatedProducts,
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Failed to retrieve related products',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 }

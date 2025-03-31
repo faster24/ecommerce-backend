@@ -16,10 +16,13 @@ class DatabaseSeeder extends Seeder
     {
         DB::raw('SET time_zone=\'+00:00\'');
 
-        // Clear images
         Storage::deleteDirectory('public');
 
-        // Admin
+        $this->call([
+            CategorySeeder::class,
+            BrandSeeder::class
+        ]);
+
         $this->command->warn(PHP_EOL . 'Creating admin user...');
         $user = $this->withProgressBar(1, fn () => User::factory(1)->create([
             'name' => 'Demo User',
