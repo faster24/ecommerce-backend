@@ -38,8 +38,7 @@ class AdminPanelProvider extends PanelProvider
             ->widgets([
             ])
             ->unsavedChangesAlerts()
-            ->brandLogo(fn () => view('filament.app.logo'))
-            ->brandLogoHeight('1.25rem')
+            ->brandName('Swiss Time Square')
             ->navigationGroups([
                 'Shop',
                 'Blog',
