@@ -343,4 +343,14 @@ class OrderResource extends Resource
             ])
             ->required();
     }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        $user = auth()->user();
+        if ($user->hasRole('supplier')) {
+            return false;
+        }
+        return true;
+    }
 }
+

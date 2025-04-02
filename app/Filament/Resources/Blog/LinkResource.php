@@ -146,4 +146,13 @@ class LinkResource extends Resource
             'edit' => Pages\EditLink::route('/{record}/edit'),
         ];
     }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        $user = auth()->user();
+        if ($user->hasRole('supplier')) {
+            return false; // Hide for supplier role
+        }
+        return true;// Show for others with permission
+    }
 }

@@ -117,4 +117,13 @@ class AuthorResource extends Resource
             'index' => Pages\ManageAuthors::route('/'),
         ];
     }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        $user = auth()->user();
+        if ($user->hasRole('supplier')) {
+            return false; // Hide for supplier role
+        }
+        return true;
+    }
 }

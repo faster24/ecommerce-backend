@@ -132,4 +132,13 @@ class CustomerResource extends Resource
     {
         return ['name', 'email'];
     }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        $user = auth()->user();
+        if ($user->hasRole('supplier')) {
+            return false;
+        }
+        return true;
+    }
 }

@@ -119,4 +119,13 @@ class CategoryResource extends Resource
             'index' => Pages\ManageCategories::route('/'),
         ];
     }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        $user = auth()->user();
+        if ($user->hasRole('supplier')) {
+            return false; // Hide for supplier role
+        }
+        return $user->can('view_any_user'); // Show for others with permission
+    }
 }

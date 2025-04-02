@@ -125,4 +125,13 @@ class CategoryResource extends Resource
             'edit' => \App\Filament\Clusters\Products\Resources\CategoryResource\Pages\EditCategory::route('/{record}/edit'),
         ];
     }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        $user = auth()->user();
+        if ($user->hasRole('supplier')) {
+            return false;
+        }
+        return true;
+    }
 }

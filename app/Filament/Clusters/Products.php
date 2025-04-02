@@ -13,4 +13,9 @@ class Products extends Cluster
     protected static ?int $navigationSort = 0;
 
     protected static ?string $slug = 'shop/products';
+
+    public static function canAccess(): bool
+    {
+        return auth()->user()->hasRole('super_admin');
+    }
 }

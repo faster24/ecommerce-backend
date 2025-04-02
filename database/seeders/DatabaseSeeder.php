@@ -19,15 +19,20 @@ class DatabaseSeeder extends Seeder
         Storage::deleteDirectory('public');
 
         $this->call([
+            BlogCategorySeeder::class,
+            BlogAuthorSeeder::class,
+            BlogPostSeeder::class,
             CategorySeeder::class,
             BrandSeeder::class
         ]);
 
         $this->command->warn(PHP_EOL . 'Creating admin user...');
+
         $user = $this->withProgressBar(1, fn () => User::factory(1)->create([
             'name' => 'Demo User',
             'email' => 'admin@filamentphp.com',
         ]));
+
         $this->command->info('Admin user created.');
     }
 

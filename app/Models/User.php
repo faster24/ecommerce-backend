@@ -14,7 +14,7 @@ use Illuminate\Support\Collection;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable implements FilamentUser, HasTenants, MustVerifyEmail
+class User extends Authenticatable implements FilamentUser, MustVerifyEmail
 {
     use HasApiTokens;
     use HasFactory;
@@ -36,19 +36,7 @@ class User extends Authenticatable implements FilamentUser, HasTenants, MustVeri
         'email_verified_at' => 'datetime',
     ];
 
-    public function canAccessPanel(Panel $panel): bool
-    {
-        return true;
-    }
-
-    public function canAccessTenant(Model $tenant): bool
-    {
-        return true;
-    }
-
-    /** @return Collection<int,Team> */
-    public function getTenants(Panel $panel): Collection
-    {
-        return Team::all();
+    public function canAccessPanel(\Filament\Panel $panel): bool {
+        return $this->hasAnyRole(['supplier', 'super_admin']) || $this->can('access_panel');
     }
 }

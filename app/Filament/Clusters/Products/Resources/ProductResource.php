@@ -147,11 +147,6 @@ class ProductResource extends Resource
                     ->sortable()
                     ->columnSpan(2),
 
-                Tables\Columns\TextColumn::make('paid_supplies_quantity')
-                    ->label('Stock Qty')
-                    ->numeric()
-                    ->sortable()
-                    ->getStateUsing(fn ($record) => $record->paid_supplies_quantity)
             ])
             ->filters([
                 QueryBuilder::make()
@@ -220,4 +215,12 @@ class ProductResource extends Resource
         return parent::getGlobalSearchEloquentQuery()->with(['brand']);
     }
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        $user = auth()->user();
+        if ($user->hasRole('supplier')) {
+            return false;
+        }
+        return true;
+    }
 }
