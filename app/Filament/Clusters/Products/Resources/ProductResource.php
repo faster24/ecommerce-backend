@@ -104,12 +104,14 @@ class ProductResource extends Resource
                             ->schema([
                                 Forms\Components\Select::make('shop_brand_id')
                                     ->relationship('brand', 'name')
+                                    ->preload()
                                     ->searchable()
                                     ->hiddenOn(ProductsRelationManager::class),
 
                                 Forms\Components\Select::make('categories')
                                     ->relationship('categories', 'name')
                                     ->multiple()
+                                    ->preload()
                                     ->required(),
                             ]),
                     ])

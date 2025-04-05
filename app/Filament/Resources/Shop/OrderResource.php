@@ -352,5 +352,10 @@ class OrderResource extends Resource
         }
         return true;
     }
+
+    public static function canCreate(): bool
+    {
+        return false;
+    }
 }
 

@@ -115,4 +115,8 @@ class TicketResource extends Resource
         return true; // Show for others with permission
     }
 
+    public static function canCreate(): bool
+    {
+        return false;
+    }
 }
