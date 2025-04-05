@@ -37,7 +37,7 @@ class SupplyResource extends Resource
                     ->searchable()
                     ->required(),
 
-                Hidden::make('suppier_id')->default(auth()->id()),
+                Hidden::make('supplier_id')->default(auth()->id()),
 
                 TextInput::make('quantity')->numeric(),
                 TextInput::make('price')->numeric(),

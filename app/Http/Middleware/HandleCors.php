@@ -19,7 +19,6 @@ class HandleCors
         if (!$origin) {
             return $next($request);
         }
-
         // Check if the request origin is allowed
         if (in_array($origin, $allowedOrigins)) {
             // Add CORS headers to the response
@@ -44,7 +43,6 @@ class HandleCors
         }
 
         // If the origin is not allowed, return a 403 response
-        return response('Forbidden', 403)
-            ->header('Content-Type', 'text/plain');
+        return $next($request);
     }
 }
