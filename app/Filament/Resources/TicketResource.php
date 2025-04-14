@@ -20,6 +20,7 @@ use Filament\Forms\Components\Select;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
+use Filament\Forms\Components\DatePicker;
 
 class TicketResource extends Resource
 {
@@ -61,7 +62,39 @@ class TicketResource extends Resource
                     ]),
             ])
             ->filters([
-                //
+                Tables\Filters\Filter::make('created_at')
+                    ->form([
+                        DatePicker::make('from')
+                            ->label('From Date')
+                            ->displayFormat('M d, Y'),
+                        DatePicker::make('to')
+                            ->label('To Date')
+                            ->displayFormat('M d, Y'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['from'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                            )
+                            ->when(
+                                $data['to'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                            );
+                    })
+                    ->indicateUsing(function (array $data): array {
+                        $indicators = [];
+
+                        if ($data['from'] ?? null) {
+                            $indicators['from'] = 'From ' . Carbon::parse($data['from'])->toFormattedDateString();
+                        }
+
+                        if ($data['to'] ?? null) {
+                            $indicators['to'] = 'To ' . Carbon::parse($data['to'])->toFormattedDateString();
+                        }
+
+                        return $indicators;
+                    }),
             ])
             ->actions([
                 Action::make('resolve')
