@@ -7,23 +7,17 @@ use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-    // Fetch all products with pagination
     public function index(Request $request)
     {
-        $perPage = $request->input('per_page', 10); // Default to 10 items per page
-
-        // Fetch paginated products
+        $perPage = $request->input('per_page', 10);
         $products = Product::paginate($perPage);
 
-        // Add image URLs to each product
         $products->getCollection()->transform(function ($product) {
-            // Get the media (images) associated with the product
-            $media = $product->getMedia('product-images'); // 'images' is the media collection name
+            $media = $product->getMedia('product-images');
             $imageUrls = $media->map(function ($item) {
-                return $item->getUrl(); // Get the full URL of the image
+                return $item->getUrl();
             });
 
-            // Add the image URLs to the product object
             $product->image_urls = $imageUrls;
 
             return $product;

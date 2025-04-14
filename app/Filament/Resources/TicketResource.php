@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Exports\Blog\YearlyTicketExport;
+use App\Filament\Exports\Blog\MonthlyTicketExport;
 use App\Filament\Resources\TicketResource\Pages;
 use App\Filament\Resources\TicketResource\RelationManagers;
 use App\Models\Ticket;
@@ -14,6 +16,10 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Tables\Actions\Action;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\Select;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
+use Maatwebsite\Excel\Facades\Excel;
+use Carbon\Carbon;
 
 class TicketResource extends Resource
 {
@@ -29,6 +35,7 @@ class TicketResource extends Resource
     {
         return $form
             ->schema([
+                //
             ]);
     }
 
@@ -43,14 +50,14 @@ class TicketResource extends Resource
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
-                ->label('Created At')
-                ->dateTime('F j, Y, g:i A'),
+                    ->label('Created At')
+                    ->dateTime('F j, Y, g:i A'),
                 Tables\Columns\TextColumn::make('status')
                     ->sortable()
                     ->badge()
                     ->colors([
-                        'warning' => 'pending', // Yellow for pending
-                        'success' => 'resolved', // Green for resolved
+                        'warning' => 'pending',
+                        'success' => 'resolved',
                     ]),
             ])
             ->filters([
@@ -72,7 +79,7 @@ class TicketResource extends Resource
                             ->rows(4),
                     ])
                     ->action(function (Ticket $record, array $data) {
-                        $reply = $record->replies()->create([
+                        $record->replies()->create([
                             'message' => $data['message'],
                         ]);
 
@@ -87,6 +94,30 @@ class TicketResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
+            ])
+            ->headerActions([
+                ExportAction::make('export_yearly')
+                    ->label('Export Yearly Report')
+                    ->exports([new YearlyTicketExport()])
+                    ->color('primary'),
+                Action::make('export_monthly')
+                    ->label('Export Monthly Report')
+                    ->form([
+                        Select::make('year')
+                            ->label('Select Year')
+                            ->options(
+                                Ticket::selectRaw('YEAR(created_at) as year')
+                                    ->distinct()
+                                    ->orderBy('year', 'desc')
+                                    ->pluck('year', 'year')
+                                    ->toArray()
+                            )
+                            ->required(),
+                    ])
+                    ->action(function (array $data) {
+                        return Excel::download(new MonthlyTicketExport($data['year']), 'monthly_ticket_report_' . $data['year'] . '_' . Carbon::now()->format('Y-m-d') . '.xlsx');
+                    })
+                    ->color('primary'),
             ]);
     }
 
@@ -110,9 +141,9 @@ class TicketResource extends Resource
     {
         $user = auth()->user();
         if ($user->hasRole('supplier')) {
-            return false; // Hide for supplier role
+            return false;
         }
-        return true; // Show for others with permission
+        return true;
     }
 
     public static function canCreate(): bool

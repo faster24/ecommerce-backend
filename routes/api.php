@@ -49,3 +49,4 @@ Route::prefix('tickets')->group(function() {
     Route::post('/', [TicketController::class, 'store']);
     Route::get('/{id}', [TicketController::class, 'show']);
 });
+
