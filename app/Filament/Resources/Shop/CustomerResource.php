@@ -13,7 +13,6 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Squire\Models\Country;
 
 class CustomerResource extends Resource
 {
@@ -82,20 +81,38 @@ class CustomerResource extends Resource
                     ->label('Email address')
                     ->searchable(isIndividual: true, isGlobal: false)
                     ->sortable(),
-                Tables\Columns\TextColumn::make('country')
-                    ->getStateUsing(fn ($record): ?string => Country::find($record->addresses->first()?->country)?->name ?? null),
                 Tables\Columns\TextColumn::make('phone')
                     ->searchable()
                     ->sortable(),
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
+                Tables\Filters\SelectFilter::make('year')
+                    ->label('Year Created')
+                    ->options(
+                        Customer::selectRaw('YEAR(created_at) as year')
+                            ->distinct()
+                            ->pluck('year')
+                            ->mapWithKeys(fn ($year) => [$year => $year])
+                            ->toArray()
+                    )
+                    ->query(fn (Builder $query, array $data) => $query->when(
+                        $data['value'],
+                        fn (Builder $query, $year) => $query->whereYear('created_at', $year)
+                    )),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
             ])
-            ->groupedBulkActions([
-            ]);
+            ->headerActions([
+                Tables\Actions\ExportAction::make()
+                ->label('Export Yearly Customers')
+                ->exporter(\App\Filament\Exports\YearlyCustomerExporter::class)
+                ->fileName(fn () => 'yearly-customers-' . now()->format('Y-m-d') . '.xlsx')
+                ->requiresConfirmation()
+                ->visible(fn () => true),
+            ])
+            ->groupedBulkActions([]);
     }
 
     /** @return Builder<Customer> */

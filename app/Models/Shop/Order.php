@@ -3,6 +3,7 @@
 namespace App\Models\Shop;
 
 use App\Enums\OrderStatus;
+use App\Enums\DeliveryStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -27,6 +28,7 @@ class Order extends Model
         'number',
         'total_price',
         'status',
+        'delivery_status',
         'currency',
         'shipping_price',
         'shipping_method',
@@ -35,6 +37,7 @@ class Order extends Model
 
     protected $casts = [
         'status' => OrderStatus::class,
+        'delivery_status' => DeliveryStatus::class,
     ];
 
     /** @return MorphOne<OrderAddress> */

@@ -102,7 +102,6 @@ class OrderController extends Controller
             });
            }
 
-    // Get the current order (new or processing) for the authenticated customer
     public function currentOrder()
     {
         $user = Auth::user();
@@ -176,7 +175,6 @@ class OrderController extends Controller
             'payments'
         ])
             ->where('shop_customer_id', $customer->id)
-            ->whereIn('status', [OrderStatus::New, OrderStatus::Processing])
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -190,7 +188,8 @@ class OrderController extends Controller
                 return [
                     'id' => $order->id,
                     'number' => $order->number,
-                    'status' => $order->status->value, // Enum value
+                    'status' => $order->status->value,
+                    'delivery_status' => $order->delivery_status,
                     'total_price' => $order->total_price,
                     'shipping_price' => $order->shipping_price,
                     'shipping_method' => $order->shipping_method,

@@ -39,6 +39,7 @@ class ProductController extends Controller
             'name' => $product->name,
             'price' => $product->price,
             'description' => $product->description,
+            'stock_qty' => $product->stock_qty,
             'image' => $image,
             'brand' => $product->brand ? [
                 'id' => $product->brand->id,

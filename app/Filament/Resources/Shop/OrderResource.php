@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Shop;
 
+use App\Enums\DeliveryStatus;
 use App\Enums\OrderStatus;
 use App\Filament\Clusters\Products\Resources\ProductResource;
 use App\Filament\Resources\Shop\OrderResource\Pages;
@@ -22,7 +23,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Carbon;
-use Squire\Models\Currency;
+use Illuminate\Support\Facades\DB;
 
 class OrderResource extends Resource
 {
@@ -92,6 +93,17 @@ class OrderResource extends Resource
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('status')
                     ->badge(),
+                Tables\Columns\TextColumn::make('delivery_status')
+                    ->badge()
+                    ->formatStateUsing(fn ($state) => $state instanceof DeliveryStatus ? str($state->value)->title()->replace('_', ' ') : $state)
+                    ->color(fn ($state) => match ($state) {
+                        DeliveryStatus::PENDING => 'gray',
+                        DeliveryStatus::OUT_FOR_DELIVERY => 'warning',
+                        DeliveryStatus::DELIVERED => 'success',
+                        DeliveryStatus::FAILED => 'danger',
+                        DeliveryStatus::RETURNED => 'info',
+                        default => 'gray',
+                    }),
                 Tables\Columns\TextColumn::make('total_price')
                     ->searchable()
                     ->sortable()
@@ -145,6 +157,48 @@ class OrderResource extends Resource
 
                         return $indicators;
                     }),
+
+                Tables\Filters\SelectFilter::make('year')
+                    ->label('Year')
+                    ->options(
+                        Order::selectRaw('YEAR(created_at) as year')
+                            ->distinct()
+                            ->pluck('year')
+                            ->mapWithKeys(fn ($year) => [$year => $year])
+                            ->toArray()
+                    )
+                    ->query(fn (Builder $query, array $data) => $query->when(
+                        $data['value'],
+                        fn (Builder $query, $year) => $query->whereYear('created_at', $year)
+                    )),
+
+                Tables\Filters\SelectFilter::make('status')
+                    ->label('Order Status')
+                    ->options(OrderStatus::class)
+                    ->query(fn (Builder $query, array $data) => $query->when(
+                        $data['value'],
+                        fn (Builder $query, $value) => $query->where('status', $value)
+                    )),
+
+                Tables\Filters\SelectFilter::make('delivery_status')
+                    ->label('Delivery Status')
+                    ->options(DeliveryStatus::class)
+                    ->query(fn (Builder $query, array $data) => $query->when(
+                        $data['value'],
+                        fn (Builder $query, $value) => $query->where('delivery_status', $value)
+                    )),
+            ])
+            ->headerActions([
+                Tables\Actions\ExportAction::make()
+                    ->label('Export Yearly Orders')
+                    ->exporter(\App\Filament\Exports\YearlyOrderExporter::class)
+                    ->modifyQueryUsing(function (Builder $query) {
+                        return $query->when(
+                            request()->has('tableFilters.year.value'),
+                            fn (Builder $query) => $query->whereYear('created_at', request()->get('tableFilters.year.value'))
+                        );
+                    })
+                    ->fileName(fn () => 'yearly-orders-' . now()->format('Y-m-d') . '.xlsx'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -203,7 +257,6 @@ class OrderResource extends Resource
     public static function getGlobalSearchResultDetails(Model $record): array
     {
         /** @var Order $record */
-
         return [
             'Customer' => optional($record->customer)->name,
         ];
@@ -219,7 +272,6 @@ class OrderResource extends Resource
     {
         /** @var class-string<Model> $modelClass */
         $modelClass = static::$model;
-
         return (string) $modelClass::where('status', 'new')->count();
     }
 
@@ -275,9 +327,14 @@ class OrderResource extends Resource
                 ->options(OrderStatus::class)
                 ->required(),
 
+            Forms\Components\ToggleButtons::make('delivery_status')
+                ->inline()
+                ->options(DeliveryStatus::class)
+                ->required()
+                ->default(DeliveryStatus::PENDING),
+
             AddressForm::make('address')
                 ->columnSpan('full'),
-
         ];
     }
 
@@ -324,13 +381,10 @@ class OrderResource extends Resource
                     ->icon('heroicon-m-arrow-top-right-on-square')
                     ->url(function (array $arguments, Repeater $component): ?string {
                         $itemData = $component->getRawItemState($arguments['item']);
-
                         $product = Product::find($itemData['shop_product_id']);
-
                         if (! $product) {
                             return null;
                         }
-
                         return ProductResource::getUrl('edit', ['record' => $product]);
                     }, shouldOpenInNewTab: true)
                     ->hidden(fn (array $arguments, Repeater $component): bool => blank($component->getRawItemState($arguments['item'])['shop_product_id'])),
@@ -358,4 +412,3 @@ class OrderResource extends Resource
         return false;
     }
 }
-

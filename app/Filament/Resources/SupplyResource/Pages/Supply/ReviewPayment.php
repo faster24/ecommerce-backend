@@ -8,6 +8,8 @@ use Filament\Actions\Action; // Correct namespace for header actions
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
+use App\Models\Shop\Product;
+use App\Models\Shop\Supply;
 
 class ReviewPayment extends EditRecord
 {
@@ -102,8 +104,31 @@ class ReviewPayment extends EditRecord
      */
     protected function afterSave(): void
     {
+        $record = $this->record;
+
+        $product = Product::find($record->product_id);
+
+        if (!$product) {
+            Notification::make()
+                ->title('Error')
+                ->body('Product not found.')
+                ->danger()
+                ->send();
+            return;
+        }
+
+        if ($record->payment_status === 'paid') {
+            $product->increment('stock_qty', $record->quantity);
+            Notification::make()
+                ->title('Stock Updated')
+                ->body("Added {$record->quantity} to {$product->name}'s stock.")
+                ->success()
+                ->send();
+        }
+
         Notification::make()
             ->title('Payment Status Updated')
+            ->body("Payment status set to {$record->payment_status}.")
             ->success()
             ->send();
     }
