@@ -25,6 +25,7 @@ class DatabaseSeeder extends Seeder
             CategorySeeder::class,
             BrandSeeder::class,
             TicketSeeder::class,
+            RoleSeeder::class,
         ]);
 
         $this->command->warn(PHP_EOL . 'Creating admin user...');
@@ -33,6 +34,8 @@ class DatabaseSeeder extends Seeder
             'name' => 'Demo User',
             'email' => 'admin@filamentphp.com',
         ]));
+
+        User::factory(19)->create();
 
         $this->command->info('Admin user created.');
     }
