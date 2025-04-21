@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 
 class PostResource extends Resource
 {
@@ -78,8 +79,10 @@ class PostResource extends Resource
 
                 Forms\Components\Section::make('Image')
                     ->schema([
-                        Forms\Components\FileUpload::make('image')
-                            ->image()
+                        SpatieMediaLibraryFileUpload::make('media')
+                            ->collection('blog-images')
+                            ->multiple()
+                            ->maxFiles(5)
                             ->hiddenLabel(),
                     ])
                     ->collapsible(),
@@ -90,8 +93,9 @@ class PostResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\ImageColumn::make('image')
-                    ->label('Image'),
+                Tables\Columns\SpatieMediaLibraryImageColumn::make('blog-image')
+                    ->label('Image')
+                    ->collection('blog-images'),
 
                 Tables\Columns\TextColumn::make('title')
                     ->searchable()

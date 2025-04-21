@@ -2,9 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Blog\Post;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 class BlogPostSeeder extends Seeder
 {
@@ -55,6 +54,23 @@ class BlogPostSeeder extends Seeder
             ],
         ];
 
-        DB::table('blog_posts')->insert($posts);
+        $sampleFiles = [
+            storage_path('sample-uploads/post-1.jpg'),
+            storage_path('sample-uploads/post-2.jpg'),
+            storage_path('sample-uploads/post-3.jpg'),
+        ];
+
+        foreach ($posts as $index => $postData) {
+            $post = Post::create($postData);
+
+            $filePath = $sampleFiles[$index] ?? null;
+
+            if ($filePath && file_exists($filePath)) {
+                $post->addMedia($filePath)
+                     ->usingFileName(basename($filePath))
+                     ->preservingOriginal()
+                     ->toMediaCollection('blog-images');
+            }
+        }
     }
 }

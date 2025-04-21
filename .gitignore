@@ -13,3 +13,7 @@ npm-debug.log
 yarn-error.log
 /.idea
 /.vscode
+
+# Allow storage/app/public/sample-uploads/ to be tracked
+!storage/app/public/sample-uploads/
+!storage/app/public/sample-uploads/*
