@@ -2,30 +2,33 @@
 
 namespace App\Filament\Exports\Blog;
 
-use App\Models\Ticket;
-use pxlrbt\FilamentExcel\Exports\ExcelExport;
-use pxlrbt\FilamentExcel\Columns\Column;
+use App\Models\Shop\Ticket;
+use Filament\Actions\Exports\ExportColumn;
+use Filament\Actions\Exports\Exporter;
+use Filament\Actions\Exports\Models\Export;
 
-class YearlyTicketExport extends ExcelExport
+class YearlyTicketExport extends Exporter
 {
-    public function __construct(string $name = 'yearly')
-    {
-        parent::__construct($name);
-    }
+    protected static ?string $model = Ticket::class;
 
-    public function query()
-    {
-        return Ticket::selectRaw('YEAR(created_at) as year, status, COUNT(*) as count')
-            ->groupBy('year', 'status')
-            ->orderBy('year', 'desc');
-    }
-
-    public function getColumns(): array
+    public static function getColumns(): array
     {
         return [
-            Column::make('year')->heading('Year'),
-            Column::make('status')->heading('Status'),
-            Column::make('count')->heading('Ticket Count'),
+            ExportColumn::make('user.name')->label('Customer Name'),
+            ExportColumn::make('subject')->label('Subject'),
+            ExportColumn::make('created_at')->label('Issue Date'),
+            ExportColumn::make('status')->label('Status'),
         ];
+    }
+
+    public static function getCompletedNotificationBody(Export $export): string
+    {
+        $body = 'Your yearly ticket export has completed and ' . number_format($export->successful_rows) . ' ' . str('row')->plural($export->successful_rows) . ' exported.';
+
+        if ($failedRowsCount = $export->getFailedRowsCount()) {
+            $body .= ' ' . number_format($failedRowsCount) . ' ' . str('row')->plural($failedRowsCount) . ' failed to export.';
+        }
+
+        return $body;
     }
 }

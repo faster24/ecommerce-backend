@@ -62,6 +62,20 @@ class TicketResource extends Resource
                     ]),
             ])
             ->filters([
+                Tables\Filters\SelectFilter::make('year')
+                    ->label('Year')
+                    ->options(
+                        Ticket::selectRaw('YEAR(created_at) as year')
+                            ->distinct()
+                            ->pluck('year')
+                            ->mapWithKeys(fn ($year) => [$year => $year])
+                            ->toArray()
+                    )
+                    ->query(fn (Builder $query, array $data) => $query->when(
+                        $data['value'],
+                        fn (Builder $query, $year) => $query->whereYear('created_at', $year)
+                    )),
+
                 Tables\Filters\Filter::make('created_at')
                     ->form([
                         DatePicker::make('from')
@@ -101,8 +115,8 @@ class TicketResource extends Resource
                     ->label('Resolve')
                     ->icon('heroicon-o-check')
                     ->form([
-                        Textarea::make('ticket_message')
-                            ->label('Ticket Message')
+                        Textarea::make('order_message')
+                            ->label('Order Message')
                             ->default(fn (Ticket $record) => $record->message)
                             ->disabled()
                             ->rows(4),
@@ -129,9 +143,15 @@ class TicketResource extends Resource
                 ]),
             ])
             ->headerActions([
-                ExportAction::make('export_yearly')
+                Tables\Actions\ExportAction::make()
                     ->label('Export Yearly Report')
-                    ->exports([new YearlyTicketExport()])
+                    ->exporter(\App\Filament\Exports\Blog\YearlyTicketExport::class)
+                    ->modifyQueryUsing(function (Builder $query) {
+                        return $query->when(
+                            request()->has('tableFilters.year.value'),
+                            fn (Builder $query) => $query->whereYear('created_at', request()->get('tableFilters.year.value'))
+                        );
+                    })
                     ->color('primary'),
                 Action::make('export_monthly')
                     ->label('Export Monthly Report')
