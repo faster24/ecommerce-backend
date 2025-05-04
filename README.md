@@ -53,6 +53,11 @@ Run Migrations
 php artisan migrate --seed
 ```
 
+Install and Generate Admin Acc
+`` php artisan shield:install panel
+   php artisan shield:super-admin
+``
+
 Start the Development Server
 ```bash
 php artisan serve
