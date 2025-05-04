@@ -153,24 +153,6 @@ class TicketResource extends Resource
                         );
                     })
                     ->color('primary'),
-                Action::make('export_monthly')
-                    ->label('Export Monthly Report')
-                    ->form([
-                        Select::make('year')
-                            ->label('Select Year')
-                            ->options(
-                                Ticket::selectRaw('YEAR(created_at) as year')
-                                    ->distinct()
-                                    ->orderBy('year', 'desc')
-                                    ->pluck('year', 'year')
-                                    ->toArray()
-                            )
-                            ->required(),
-                    ])
-                    ->action(function (array $data) {
-                        return Excel::download(new MonthlyTicketExport($data['year']), 'monthly_ticket_report_' . $data['year'] . '_' . Carbon::now()->format('Y-m-d') . '.xlsx');
-                    })
-                    ->color('primary'),
             ]);
     }
 
