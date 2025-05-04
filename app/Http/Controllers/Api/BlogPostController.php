@@ -10,7 +10,7 @@ class BlogPostController extends Controller
 {
     public function index()
     {
-        $posts = Post::with(['author', 'category', 'tags']) // Eager load relationships
+        $posts = Post::with(['author', 'category', 'tags' ,'media']) // Eager load relationships
             ->whereNotNull('published_at')                  // Only published posts
             ->where('published_at', '<=', now())            // Published up to current date
             ->orderBy('published_at', 'desc')               // Latest first
@@ -34,7 +34,7 @@ class BlogPostController extends Controller
 
     public function show($id)
     {
-        $post = Post::with(['author', 'category', 'tags', 'comments']) // Include comments too
+        $post = Post::with(['author', 'category', 'tags', 'comments' , 'media']) // Include comments too
             ->where('id', $id)
             ->whereNotNull('published_at')
             ->where('published_at', '<=', now())

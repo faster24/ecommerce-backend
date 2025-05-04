@@ -43,37 +43,40 @@ class PostResource extends Resource
             ->schema([
                 Forms\Components\Section::make()
                     ->schema([
-                        Forms\Components\TextInput::make('title')
-                            ->required()
-                            ->live(onBlur: true)
-                            ->maxLength(255)
-                            ->afterStateUpdated(fn (string $operation, $state, Forms\Set $set) => $operation === 'create' ? $set('slug', Str::slug($state)) : null),
+                    Forms\Components\TextInput::make('title')
+                    ->required()
+                    ->live(onBlur: true)
+                    ->maxLength(255)
+                    ->afterStateUpdated(fn (string $operation, $state, Forms\Set $set) => $operation === 'create' ? $set('slug', Str::slug($state)) : null),
 
-                        Forms\Components\TextInput::make('slug')
-                            ->disabled()
-                            ->dehydrated()
-                            ->required()
-                            ->maxLength(255)
-                            ->unique(Post::class, 'slug', ignoreRecord: true),
+                    Forms\Components\TextInput::make('slug')
+                    ->disabled()
+                    ->dehydrated()
+                    ->required()
+                    ->maxLength(255)
+                    ->unique(Post::class, 'slug', ignoreRecord: true),
 
-                        Forms\Components\MarkdownEditor::make('content')
-                            ->required()
-                            ->columnSpan('full'),
+                    Forms\Components\MarkdownEditor::make('content')
+                    ->disableToolbarButtons([
+                        'attachFiles'
+                    ])
+                    ->required()
+                    ->columnSpan('full'),
 
-                        Forms\Components\Select::make('blog_author_id')
-                            ->relationship('author', 'name')
-                            ->searchable()
-                            ->required(),
+                    Forms\Components\Select::make('blog_author_id')
+                    ->relationship('author', 'name')
+                    ->searchable()
+                    ->required(),
 
-                        Forms\Components\Select::make('blog_category_id')
-                            ->relationship('category', 'name')
-                            ->searchable()
-                            ->required(),
+                    Forms\Components\Select::make('blog_category_id')
+                    ->relationship('category', 'name')
+                    ->searchable()
+                    ->required(),
 
-                        Forms\Components\DatePicker::make('published_at')
-                            ->label('Published Date'),
+                    Forms\Components\DatePicker::make('published_at')
+                    ->label('Published Date'),
 
-                        SpatieTagsInput::make('tags'),
+                    SpatieTagsInput::make('tags'),
                     ])
                     ->columns(2),
 

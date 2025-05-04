@@ -14,6 +14,9 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
 Route::prefix('products')->controller(ProductController::class)->group(function () {
+    Route::get('/test-cors', function () {
+        return response()->json(['message' => 'CORS works']);
+    });
     Route::get('/', 'index');
     Route::get('/search', 'search');
     Route::get('/filterProduct' , 'filterByName');
