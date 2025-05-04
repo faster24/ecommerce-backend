@@ -10,18 +10,10 @@ class HandleCors
 
     public function handle(Request $request, Closure $next)
     {
-        $allowedOrigins = ['http://localhost:3000', 'http://localhost:8000'];
+        $allowedOrigins = ['http://localhost:3000', 'http://localhost:8000' , 'http://127.0.0.1:8000' , '*'];
         $origin = $request->header('Origin');
 
         if (in_array($origin, $allowedOrigins)) {
-            if ($request->isMethod('OPTIONS')) {
-                return response('', 204)
-                    ->header('Access-Control-Allow-Origin', $origin)
-                    ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS')
-                    ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With')
-                    ->header('Access-Control-Allow-Credentials', 'true');
-            }
-
             $response = $next($request);
             $response->headers->set('Access-Control-Allow-Origin', $origin);
             $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
