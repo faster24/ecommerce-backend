@@ -48,6 +48,10 @@ Generate Application Key
 php artisan key:generate
 ```
 
+```
+php artisan storage:link
+```
+
 Run Migrations 
 ```bash
 php artisan migrate --seed
