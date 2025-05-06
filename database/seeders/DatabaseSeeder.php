@@ -28,7 +28,7 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
             //ProductSeeder::class,
             CustomerSeeder::class,
-            OrderSeeder::class,
+            //OrderSeeder::class,
         ]);
 
         $this->command->warn(PHP_EOL . 'Creating admin user...');
