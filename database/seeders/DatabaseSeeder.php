@@ -21,12 +21,12 @@ class DatabaseSeeder extends Seeder
         $this->call([
             BlogCategorySeeder::class,
             BlogAuthorSeeder::class,
-            BlogPostSeeder::class,
+            //BlogPostSeeder::class,
             CategorySeeder::class,
             BrandSeeder::class,
             TicketSeeder::class,
             RoleSeeder::class,
-            ProductSeeder::class,
+            //ProductSeeder::class,
             CustomerSeeder::class,
             OrderSeeder::class,
         ]);
